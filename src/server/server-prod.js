@@ -6,6 +6,7 @@ import { GunDBPublic } from './gun/gun-middleware'
 import app from './app'
 
 export default function start(workerId) {
+  global.workerId = workerId
   console.log(`start workerId = ${workerId}`)
 
   process.on('uncaughtException', (err, origin) => {
