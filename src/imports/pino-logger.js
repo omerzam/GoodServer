@@ -14,7 +14,7 @@ if (conf.env != 'development' && conf.rollbarToken)
 const LOG_LEVEL = conf.logLevel || 'debug'
 console.log('Starting logger', { LOG_LEVEL, env: conf.env })
 const logger = pino({
-  name: 'GoodDollar - Server',
+  name: `GoodDollar - Server worker: worker-${global.workerId || 0}`,
   level: LOG_LEVEL,
   redact: {
     paths: ['req.headers.authorization'],
