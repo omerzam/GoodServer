@@ -57,6 +57,10 @@ export const UserPrivateSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
+  covidBonus: {
+    type: Boolean,
+    default: false
+  },
   isCompleted: {
     whiteList: {
       type: Boolean,
