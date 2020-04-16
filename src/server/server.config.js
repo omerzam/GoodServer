@@ -79,7 +79,7 @@ const conf = convict({
     doc: 'min balance in GWEIs for valid admin addresses',
     format: Number,
     env: 'ADMIN_MIN_BALANCE',
-    default: 100000
+    default: 1000000
   },
   mongoQueueMaxLockTime: {
     doc: 'Max lock time for one each in mongo queue in seconds',
@@ -379,6 +379,12 @@ const conf = convict({
     format: '*',
     env: 'COVID_START_DATE',
     default: '19/4/2020'
+  },
+  enableInvites: {
+    doc: 'enable w3',
+    format: '*',
+    env: 'ENABLE_INVITES',
+    default: true
   }
 })
 
