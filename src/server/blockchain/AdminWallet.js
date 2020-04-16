@@ -264,7 +264,12 @@ export class Wallet {
         release()
       },
       onError: e => {
-        log.error('checkHanukaBonus redeem failed', e.message, e, user.identifier, user.gdAddress)
+        log.error('checkHanukaBonus redeem failed', {
+          e,
+          message: e.message,
+          user: user.identifier,
+          address: user.gdAddress
+        })
 
         fail()
       }
@@ -311,7 +316,7 @@ export class Wallet {
         release()
       },
       onError: e => {
-        log.error('covidBonus redeem failed', e.message, e, user.identifier, user.gdAddress)
+        log.error('covidBonus redeem failed', { e, message: e.message, user: user.identifier, address: user.gdAddress })
 
         fail()
       }
