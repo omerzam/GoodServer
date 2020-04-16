@@ -373,6 +373,12 @@ const conf = convict({
     format: '*',
     env: 'HANUKA_END_DATE',
     default: undefined
+  },
+  covidStartDate: {
+    doc: 'Covid Bonus Start Day',
+    format: '*',
+    env: 'COVID_START_DATE',
+    default: '19/4/2020'
   }
 })
 

@@ -271,6 +271,53 @@ export class Wallet {
     })
   }
 
+  async checkCovidBonus(user, storage) {
+    if (user.covidBonus) {
+      return
+    }
+
+    const now = moment().utcOffset('+0200')
+    const startCovid = moment(conf.covidStartDate, 'DD/MM/YYYY').utcOffset('+0200')
+    if (now.isBefore(startCovid)) {
+      return
+    }
+
+    const bonusInWei = gdToWei(100)
+
+    const { release, fail } = await txManager.lock(user.gdAddress, 0)
+    const recheck = await storage.getUserField(user.identifier, 'covidBonus')
+    if (recheck) {
+      release()
+      return
+    }
+    return AdminWallet.redeemBonuses(user.gdAddress, bonusInWei, {
+      onTransactionHash: hash => {
+        log.debug('covidBonus redeem - txhash received', {
+          hash,
+          identifier: user.identifier,
+          gdAddress: user.gdAddress
+        })
+      },
+      onReceipt: async r => {
+        log.info('covidBonus redeem - receipt received', {
+          hash: r.transactionHash,
+          identifier: user.identifier,
+          gdAddress: user.gdAddress
+        })
+        await storage.updateUser({
+          identifier: user.loggedInAs,
+          covidBonus: true
+        })
+        release()
+      },
+      onError: e => {
+        log.error('covidBonus redeem failed', e.message, e, user.identifier, user.gdAddress)
+
+        fail()
+      }
+    })
+  }
+
   /**
    * charge bonuses for user via `bonus` contract
    * @param {string} address
