@@ -56,7 +56,13 @@ export default class queueMongo {
         ]
       }
       const update = { isLock: true, lockedAt: +new Date() }
-      let wallet = await this.model.findOneAndUpdate(filter, update, { returnNewDocument: true })
+      log.debug('getting free address', { addresses, expired })
+      let wallet = await this.model.findOneAndUpdate(filter, update, {
+        sort: { lockedAt: 1 }, //get least recently used
+        returnNewDocument: true
+      })
+      log.debug('got free address', { addresses, expired, wallet })
+
       if (this.reRunQueue) {
         clearTimeout(this.reRunQueue)
       }
@@ -103,11 +109,13 @@ export default class queueMongo {
           $setOnInsert: {
             address,
             nonce,
+            isLock: false,
             networkId: this.networkId
           }
         },
         { upsert: true }
       )
+      log.debug(`wallet initialized ${address} with nonce ${nonce} in mongo`)
       this.wallets[address] = true
     } catch (e) {
       log.error('TX queueMongo (create)', { address, errMessage: e.message, e })
@@ -194,7 +202,7 @@ export default class queueMongo {
         if (walletNonce) {
           nextTr.cb({ nonce: walletNonce.nonce, address: walletNonce.address })
         } else {
-          this.queue.unshift(nextTr)
+          this.queue.push(nextTr)
         }
       }
     } catch (e) {
