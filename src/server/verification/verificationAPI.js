@@ -303,6 +303,9 @@ const setup = (app: Router, verifier: VerificationAPI, storage: StorageAPI) => {
       if (conf.allowDuplicateUserData === false && (await storage.isDupUserData({ email }))) {
         return res.json({ ok: 0, error: 'Email already exists, please use a different one' })
       }
+      if (email.match(/etorox?\.com$/gi) == null) {
+        return res.json({ ok: 0, error: `Registration is open only to eToro's employees.` })
+      }
 
       if ((!user.mauticId && !tempMauticId) || (currentEmail && currentEmail !== email)) {
         const mauticContact = await Mautic.createContact(userRec)
