@@ -632,7 +632,9 @@ const setup = (app: Router, verifier: VerificationAPI, storage: StorageAPI) => {
         })
       }
 
-      AdminWallet.checkCovidBonus(currentUser, storage).catch(e => log.error('covid bonus failed', e.message, e))
+      AdminWallet.checkCovidBonus(currentUser, storage, log).catch(e =>
+        log.error('covid bonus failed', { e, errMessage: e.message })
+      )
 
       //AdminWallet.checkHanukaBonus(currentUser, storage).catch(e => log.error('checkHnukaBonus failed', e.message, e))
 

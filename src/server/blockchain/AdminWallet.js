@@ -276,7 +276,7 @@ export class Wallet {
     })
   }
 
-  async checkCovidBonus(user, storage) {
+  async checkCovidBonus(user, storage, log) {
     let bonus = 200
     if (user.covidBonusDouble) {
       return
@@ -294,7 +294,7 @@ export class Wallet {
     const bonusInWei = gdToWei(bonus)
 
     const { release, fail } = await txManager.lock(user.gdAddress, 0)
-    const recheck = await storage.getUserField(user.identifier, 'covidBonus')
+    const recheck = await storage.getUserField(user.identifier, 'covidBonusDouble')
     if (recheck) {
       release()
       return
