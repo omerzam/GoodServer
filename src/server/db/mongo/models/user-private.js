@@ -61,6 +61,10 @@ export const UserPrivateSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  covidBonusDouble: {
+    type: Boolean,
+    default: false
+  },
   isCompleted: {
     whiteList: {
       type: Boolean,

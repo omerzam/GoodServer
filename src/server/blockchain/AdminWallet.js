@@ -277,8 +277,12 @@ export class Wallet {
   }
 
   async checkCovidBonus(user, storage) {
-    if (user.covidBonus) {
+    let bonus = 200
+    if (user.covidBonusDouble) {
       return
+    }
+    if (user.covidBonus) {
+      bonus = 100
     }
 
     const now = moment().utcOffset('+0200')
@@ -287,7 +291,7 @@ export class Wallet {
       return
     }
 
-    const bonusInWei = gdToWei(100)
+    const bonusInWei = gdToWei(bonus)
 
     const { release, fail } = await txManager.lock(user.gdAddress, 0)
     const recheck = await storage.getUserField(user.identifier, 'covidBonus')
@@ -311,7 +315,7 @@ export class Wallet {
         })
         await storage.updateUser({
           identifier: user.loggedInAs,
-          covidBonus: true
+          covidBonusDouble: true
         })
         release()
       },
