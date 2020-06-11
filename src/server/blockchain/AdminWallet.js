@@ -131,7 +131,7 @@ export class Wallet {
     for (let addr of this.addresses) {
       const balance = await this.web3.eth.getBalance(addr)
       log.info(`admin wallet ${addr} balance ${balance}`)
-      if (balance > adminMinBalance) {
+      if (parseInt(balance) > parseInt(adminMinBalance)) {
         this.filledAddresses.push(addr)
       }
     }
