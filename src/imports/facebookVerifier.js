@@ -34,10 +34,10 @@ class FacebookVerifier {
   }
 
   _configureResponses() {
-    const { http, _transformResponse } = this
+    const { http, _transformResponse, _exceptionInterceptor } = this
     const { response } = http.interceptors
 
-    response.use(_transformResponse, exception => this._exceptionInterceptor(exception))
+    response.use(_transformResponse, _exceptionInterceptor)
   }
 
   _transformResponse(response) {
