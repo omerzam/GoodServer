@@ -1,0 +1,32 @@
+language: node_js
+
+cache:
+  npm: true
+
+env:
+  global:
+    - GUNDB_PASS=test
+    - JWT_PASS=test
+    - MNEMONIC="myth like bonus scare over problem client lizard pioneer submit female collect"
+    - ADMIN_MNEMONIC="they bus duty candy uncover assault bullet kitchen kit acid spin physical"
+    - TRAVIS=true
+    - NETWORK=develop
+    - CI=false
+    - MARKET_PASSWORD=markettokenmarkettokenmarkettoke
+
+# before_install:
+# - npm install -g ganache-cli truffle webpack
+
+before_script:
+  - pushd node_modules/@gooddollar/goodcontracts
+  - npm ci
+  - npm run ganache &
+  - npm run wait
+  - npm run deploy
+  - popd
+
+script:
+  - export MNEMONIC=$ADMIN_MNEMONIC
+  - npm run coverage -- --silent
+  - npm run coveralls
+  - npm run build
