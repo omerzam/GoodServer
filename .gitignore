@@ -10,6 +10,7 @@ yarn.lock
 secrets.json
 openSubjects.txt
 publicdb
+publicdb0
 privatedb
 testdb
 config/*/*
