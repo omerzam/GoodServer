@@ -10,10 +10,11 @@ yarn.lock
 secrets.json
 openSubjects.txt
 publicdb
-publicdb0
+publicdb*
 privatedb
 testdb
 config/*/*
 test/jest-envs/*
 uploads/*
 .idea/
+.test
