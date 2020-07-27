@@ -312,8 +312,9 @@ class UserPrivate {
       )
     } catch (exception) {
       const { message: errMessage } = exception
+      const logPayload = { e: exception, errMessage, tasksIdentifiers }
 
-      logger.error("Couldn't unlock and update delayed tasks", errMessage, exception, { tasksIdentifiers })
+      logger.error("Couldn't unlock and update delayed tasks", logPayload)
       throw exception
     }
   }
