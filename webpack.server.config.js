@@ -14,27 +14,8 @@ const webpack = require('webpack')
 const { version } = require('./package.json')
 
 module.exports = (_, argv) => {
-  const isProductionMode = argv.mode === 'production'
-  const SERVER_PATH =  `./src/server/${isProductionMode ? 'index-prod' : 'server-dev'}.js`
+  const SERVER_PATH = argv.mode === 'production' ? './src/server/index-prod.js' : './src/server/server-dev.js'
   const { VERSION, NODE_ENV } = process.env
-
-  const plugins = [
-    new webpack.DefinePlugin({}),
-    new NodemonPlugin(),
-  ]
-
-  if (isProductionMode) {
-    plugins.push(new SentryCliPlugin({
-      rewrite: true,
-      release: VERSION || version,
-      deploy: { env: NODE_ENV || 'development' },
-      configFile: './sentry.properties',
-
-      include: ['./dist'],
-      ignoreFile: '.gitignore',
-      ignore: ['node_modules', 'webpack.*.config.js'],
-    }))
-  }
 
   return {
     entry: {
@@ -57,7 +38,20 @@ module.exports = (_, argv) => {
       nodeEnv: false
     },
     externals: [nodeExternals()], // Need this to avoid error when working with Express
-    plugins,
+    plugins: [
+      new webpack.DefinePlugin({}),
+      new NodemonPlugin(),
+      new SentryCliPlugin({
+        rewrite: true,
+        release: VERSION || version,
+        deploy: { env: NODE_ENV || 'development' },
+        configFile: './sentry.properties',
+
+        include: ['./dist'],
+        ignoreFile: '.gitignore',
+        ignore: ['node_modules', 'webpack.*.config.js'],
+      })
+    ],
     module: {
       rules: [
         {
