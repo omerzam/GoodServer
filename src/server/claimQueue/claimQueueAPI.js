@@ -13,10 +13,10 @@ const ClaimQueue = {
     return Promise.all([
       user.claimQueue && storage.updateUser({ identifier: user.identifier, 'claimQueue.status': 'whitelisted' }),
       Mautic.updateContact(user.mauticId, { tags: ['claimqueue_claimed'] }).catch(e => {
-        log.error('Failed Mautic tagging  user claimed', e.message, e, { mauticId: user.mauticId })
+        log.error('Failed Mautic tagging  user claimed', { errMessage: e.message, e, mauticId: user.mauticId })
       }),
       Mautic.addContactsToSegment([user.mauticId], conf.mauticClaimQueueWhitelistedSegmentId).catch(e => {
-        log && log.error('Failed Mautic adding user to claim queue whitelisted segment', e.message, e)
+        log && log.error('Failed Mautic adding user to claim queue whitelisted segment', { errMessage: e.message, e })
       })
     ])
   },
@@ -61,7 +61,7 @@ const ClaimQueue = {
     const approvedUsers = pendingUsers.map(_ => _._id)
     const mauticIds = pendingUsers.map(_ => _.mauticId)
     Mautic.addContactsToSegment(mauticIds, conf.mauticClaimQueueApprovedSegmentId).catch(e => {
-      log.error('Failed Mautic adding user to claim queue approved segment', e.message, e)
+      log.error('Failed Mautic adding user to claim queue approved segment', { errMessage: e.message, e })
     })
     await storage.model.updateMany({ _id: { $in: approvedUsers } }, { $set: { 'claimQueue.status': 'approved' } })
     log.debug('claim queue updated', { pendingUsers, newAllowed, stillPending })
@@ -87,14 +87,18 @@ const ClaimQueue = {
     if (['test', 'development'].includes(conf.env) === false && user.mauticId) {
       if (status === 'pending') {
         Mautic.updateContact(user.mauticId, { tags: ['claimqueue_in'] }).catch(e => {
-          log.error('Failed Mautic tagging  user inqueue', e.message, e, { mauticId: user.mauticId })
+          log.error('Failed Mautic tagging  user inqueue', { errMessage: e.message, e, mauticId: user.mauticId })
         })
         Mautic.addContactsToSegment([user.mauticId], conf.mauticClaimQueueSegmentId).catch(e => {
-          log.error('Failed Mautic adding user to claim queue segment', e.message, e, { mauticId: user.mauticId })
+          log.error('Failed Mautic adding user to claim queue segment', {
+            errMessage: e.message,
+            e,
+            mauticId: user.mauticId
+          })
         })
       } else {
         Mautic.updateContact(user.mauticId, { tags: ['claimqueue_autoapproved'] }).catch(e => {
-          log.error('Failed Mautic tagging  user autoapproved', e.message, e, { mauticId: user.mauticId })
+          log.error('Failed Mautic tagging  user autoapproved', { errMessage: e.message, e, mauticId: user.mauticId })
         })
       }
     }

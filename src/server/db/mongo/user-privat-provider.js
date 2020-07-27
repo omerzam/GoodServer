@@ -67,7 +67,7 @@ class UserPrivate {
 
       return true
     } catch (ex) {
-      logger.error('Update user failed [mongo actions]:', ex.message, ex, { user })
+      logger.error('Update user failed [mongo actions]:', { message: ex.message, user })
     }
 
     return false
@@ -140,7 +140,7 @@ class UserPrivate {
       await this.model.deleteOne({ identifier: user.identifier })
       return true
     } catch (ex) {
-      logger.error('Delete user failed [mongo actions]:', ex.message, ex, { user })
+      logger.error('Delete user failed [mongo actions]:', { message: ex.message, user })
       return false
     }
   }
@@ -204,9 +204,9 @@ class UserPrivate {
       return taskModel.create({ userIdentifier, taskName, subject })
     } catch (exception) {
       const { message: errMessage } = exception
-      const logPayload = { taskName, userIdentifier, subject }
+      const logPayload = { e: exception, errMessage, taskName, userIdentifier, subject }
 
-      logger.error("Couldn't enqueue task", errMessage, exception, logPayload)
+      logger.error("Couldn't enqueue task", logPayload)
       throw exception
     }
   }
@@ -253,9 +253,9 @@ class UserPrivate {
       return pendingTasks
     } catch (exception) {
       const { message: errMessage } = exception
-      const logPayload = { filters, taskName }
+      const logPayload = { e: exception, errMessage, filters, taskName }
 
-      logger.error("Couldn't fetch & lock tasks for processing", errMessage, exception, logPayload)
+      logger.error("Couldn't fetch & lock tasks for processing", logPayload)
       throw exception
     }
   }
@@ -291,9 +291,9 @@ class UserPrivate {
       await taskModel.deleteMany({ status: { $in: [Running, Complete] }, _id: { $in: tasksIdentifiers } })
     } catch (exception) {
       const { message: errMessage } = exception
-      const logPayload = { tasksIdentifiers }
+      const logPayload = { e: exception, errMessage, tasksIdentifiers }
 
-      logger.error("Couldn't remove delayed tasks", errMessage, exception, logPayload)
+      logger.error("Couldn't remove delayed tasks", logPayload)
       throw exception
     }
   }

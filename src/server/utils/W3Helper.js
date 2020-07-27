@@ -45,7 +45,11 @@ export default {
             body
           })
         } else {
-          log.error('Failed to execute the request to W3 API', e.message, e, { body })
+          log.error('Failed to execute the request to W3 API', {
+            errMessage: e.message,
+            error: e,
+            body
+          })
         }
 
         throw e
