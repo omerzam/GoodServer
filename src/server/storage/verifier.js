@@ -71,8 +71,13 @@ class DefaultVerificationStrategy {
 }
 
 class FacebookVerificationStrategy {
+  constructor(verifier) {
+    assign(this, { verifier })
+  }
+
   async verify(requestPayload, userRecord, logger) {
     let emailVerified = false
+    const { verifier } = this
     const { email, torusAccessToken } = requestPayload
 
     if (userRecord.isEmailConfirmed) {
@@ -86,7 +91,7 @@ class FacebookVerificationStrategy {
     }
 
     try {
-      emailVerified = await FacebookVerifier.verifyEmail(email, torusAccessToken, logger)
+      emailVerified = await verifier.verifyEmail(email, torusAccessToken, logger)
     } catch (exception) {
       const { message: msg } = exception
 
@@ -112,7 +117,7 @@ class UserVerifier {
     // attaching strategies on first call
     if (!hasStrategiesAttached) {
       addStrategy('default', new DefaultVerificationStrategy(Config))
-      addStrategy('facebook', new FacebookVerificationStrategy())
+      addStrategy('facebook', new FacebookVerificationStrategy(FacebookVerifier.factory()))
     }
 
     return new UserVerifier(userRecord, requestPayload, logger)

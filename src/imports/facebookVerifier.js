@@ -6,8 +6,14 @@ import { isPlainObject, get } from 'lodash'
 import Config from '../server/server.config'
 import logger from '../imports/logger'
 
+const defaultLogger = logger.child({ from: 'FacebookVerifier' })
+
 class FacebookVerifier {
-  static factory(log = logger.child({ from: 'TorusVerifier' })) {}
+  static factory(logger = null) {
+    const log = logger || defaultLogger
+
+    return new FacebookVerifier(Config, Axios.create, log)
+  }
 
   constructor(Config, httpFactory, logger) {
     const { facebookGraphApiUrl } = Config
@@ -69,4 +75,4 @@ class FacebookVerifier {
   }
 }
 
-export default new FacebookVerifier(Config, Axios.create, logger.child({ from: 'FacebookVerifier' }))
+export default FacebookVerifier
