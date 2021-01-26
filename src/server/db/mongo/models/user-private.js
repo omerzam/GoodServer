@@ -1,7 +1,5 @@
 import mongoose, { Schema } from '../../mongo-db.js'
-import { MODEL_USER_PRIVATE } from './constants'
-
-export const caseInsensitive = { locale: 'en', strength: 2 }
+import { MODEL_USER_PRIVATE, caseInsensitive } from './constants'
 
 export const UserPrivateSchema = new Schema(
   {

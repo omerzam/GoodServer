@@ -1,7 +1,7 @@
 import { values } from 'lodash'
 
 import mongoose, { Schema, Types } from '../../mongo-db'
-import { MODEL_DELAYED_TASK, MODEL_USER_PRIVATE } from './constants'
+import { MODEL_DELAYED_TASK, MODEL_USER_PRIVATE, caseInsensitive } from './constants'
 
 const { ObjectId, Mixed } = Types
 
@@ -56,5 +56,9 @@ DelayedTaskSchema.index({ createdAt: -1, taskName: 1, status: 1 })
 DelayedTaskSchema.index({ createdAt: 1, 'subject.executeAt': 1 })
 DelayedTaskSchema.index({ 'subject.enrollmentIdentifier': 1, 'subject.executeAt': 1 })
 DelayedTaskSchema.index({ 'subject.enrollmentIdentifier': 1 })
+DelayedTaskSchema.index(
+  { 'subject.enrollmentIdentifier': 1 },
+  { collation: caseInsensitive, name: 'enrollmentIdentifier_insensitive' }
+)
 
 export default mongoose.model(MODEL_DELAYED_TASK, DelayedTaskSchema)

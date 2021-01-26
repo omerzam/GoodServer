@@ -9,7 +9,7 @@ export const DisposeAt = {
 }
 
 export const forEnrollment = enrollmentIdentifier => ({
-  'subject.enrollmentIdentifier': new RegExp(escapeRegExp(enrollmentIdentifier), 'i')
+  'subject.enrollmentIdentifier': enrollmentIdentifier.toLowerCase()
 })
 
 // eslint-disable-next-line require-await

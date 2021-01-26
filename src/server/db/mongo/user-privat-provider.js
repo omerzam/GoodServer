@@ -7,8 +7,11 @@ import DelayedTaskModel, { DelayedTaskStatus } from './models/delayed-task'
 import logger from '../../../imports/logger'
 
 import { type UserRecord, type DelayedTaskRecord } from '../../../imports/types'
+import { caseInsensitive } from './models/constants'
 
 class UserPrivate {
+  tasksQueriesOptions = { collation: caseInsensitive }
+
   constructor(model, taskModel, logger) {
     this.logger = logger
 
@@ -225,9 +228,9 @@ class UserPrivate {
    * @param {object} filters
    */
   async hasTasksQueued(taskName: string, filters: object = {}): Promise<boolean> {
-    const { taskModel } = this
+    const { taskModel, tasksQueriesOptions } = this
 
-    return taskModel.exists({ ...filters, taskName })
+    return taskModel.exists({ ...filters, taskName }, tasksQueriesOptions)
   }
 
   /**
@@ -236,9 +239,9 @@ class UserPrivate {
    * @param {object} filters
    */
   async cancelTasksQueued(taskName: string, filters: object = {}): Promise<void> {
-    const { taskModel } = this
+    const { taskModel, tasksQueriesOptions } = this
 
-    await taskModel.deleteOne({ ...filters, taskName })
+    await taskModel.deleteOne({ ...filters, taskName }, tasksQueriesOptions)
   }
 
   /**
@@ -249,7 +252,7 @@ class UserPrivate {
    */
   async fetchTasksForProcessing(taskName: string, filters: object = {}): Promise<DelayedTaskRecord[]> {
     const lockId = uuidv4()
-    const { taskModel, logger } = this
+    const { taskModel, logger, tasksQueriesOptions } = this
     const { Locked, Complete } = DelayedTaskStatus
 
     try {
@@ -257,7 +260,8 @@ class UserPrivate {
         // selecting tasks which aren't locked or completed by taskName and other filters
         { ...filters, status: { $nin: [Locked, Complete] }, taskName },
         // setting unique (for each fetchTasksForProcessing() call) lockId
-        { status: Locked, lockId }
+        { status: Locked, lockId },
+        tasksQueriesOptions
       )
 
       // queries aren't Promises in mongoose so we couldn't just
@@ -323,11 +327,14 @@ class UserPrivate {
    * @param {string[]} tasksIdentifiers
    */
   async removeDelayedTasks(tasksIdentifiers: string[]): Promise<void> {
-    const { taskModel, logger } = this
+    const { taskModel, logger, tasksQueriesOptions } = this
     const { Locked, Complete } = DelayedTaskStatus
 
     try {
-      await taskModel.deleteMany({ status: { $in: [Locked, Complete] }, _id: { $in: tasksIdentifiers } })
+      await taskModel.deleteMany(
+        { status: { $in: [Locked, Complete] }, _id: { $in: tasksIdentifiers } },
+        tasksQueriesOptions
+      )
     } catch (exception) {
       const { message: errMessage } = exception
       const logPayload = { tasksIdentifiers }
@@ -355,11 +362,15 @@ class UserPrivate {
    * @private
    */
   async _unlockTasksBy(filters: object, newStatus: string): Promise<void> {
-    const { taskModel, logger } = this
+    const { taskModel, logger, tasksQueriesOptions } = this
     const { Locked } = DelayedTaskStatus
 
     try {
-      await taskModel.updateMany({ ...filters, status: Locked }, { status: newStatus, lockId: null })
+      await taskModel.updateMany(
+        { ...filters, status: Locked },
+        { status: newStatus, lockId: null },
+        tasksQueriesOptions
+      )
     } catch (exception) {
       const { message: errMessage } = exception
 

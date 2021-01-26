@@ -17,6 +17,7 @@ import createMockingHelper from '../api/__tests__/__util__'
 
 import * as awsSes from '../../aws-ses/aws-ses'
 import { DisposeAt, scheduleDisposalTask, DISPOSE_ENROLLMENTS_TASK, forEnrollment } from '../cron/taskUtil'
+import { caseInsensitive } from '../../db/mongo/models/constants'
 
 describe('verificationAPI', () => {
   let server
@@ -148,7 +149,7 @@ describe('verificationAPI', () => {
 
     beforeEach(async () => {
       await storage.updateUser({ identifier: userIdentifier, isVerified: false, claimQueue: null })
-      await storage.taskModel.deleteMany(forEnrollment(enrollmentIdentifier))
+      await storage.taskModel.deleteMany(forEnrollment(enrollmentIdentifier), { collation: caseInsensitive })
 
       enrollmentProcessor.keepEnrollments = 24
       isVerifiedMock.mockResolvedValue(false)
